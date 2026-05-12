@@ -7,8 +7,8 @@ from __future__ import annotations
 
 import importlib
 import uuid
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 from ..models import Block, DocumentModel
 
@@ -28,6 +28,14 @@ EXT_PARSER_MODULES: dict[str, tuple[str, str]] = {
     "htm": ("html_parser", "parse"),
     "epub": ("epub_parser", "parse"),
     "rtf": ("rtf_parser", "parse"),
+    # Image formats — OCR'd via Tesseract.
+    "png": ("image_parser", "parse"),
+    "jpg": ("image_parser", "parse"),
+    "jpeg": ("image_parser", "parse"),
+    "tif": ("image_parser", "parse"),
+    "tiff": ("image_parser", "parse"),
+    "bmp": ("image_parser", "parse"),
+    "webp": ("image_parser", "parse"),
 }
 
 SUPPORTED_EXTENSIONS = sorted(EXT_PARSER_MODULES.keys())

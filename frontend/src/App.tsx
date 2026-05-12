@@ -6,8 +6,9 @@ import Reader from './components/Reader'
 import RsvpView from './components/RsvpView'
 import TtsBar from './components/TtsBar'
 import WelcomePage from './components/WelcomePage'
-import OnboardingQuiz from './components/OnboardingQuiz'
+import OnboardingWizard from './components/OnboardingWizard'
 import GuidedShell from './components/GuidedShell'
+import IntentionStudio from './components/IntentionStudio'
 import { useApp } from './store'
 import { INPLACE_FORMATS, exportDocument, exportDocumentInplace, getExtension } from './api'
 import { useTts } from './hooks/useTts'
@@ -88,10 +89,10 @@ function App() {
     return <WelcomePage />
   }
 
-  // Route 2: Guided mode — onboarding quiz then guided shell
+  // Route 2: Guided mode — onboarding wizard v2 then guided shell
   if (mode === 'guided') {
     if (!onboardingDone) {
-      return <OnboardingQuiz onDone={() => undefined} />
+      return <OnboardingWizard onDone={() => undefined} />
     }
     return (
       <GuidedShell onExport={handleExport}>
@@ -103,6 +104,11 @@ function App() {
         />
       </GuidedShell>
     )
+  }
+
+  // Route 4: Intention Studio — wave / quantum-entropy émetteur-récepteur
+  if (mode === 'intention') {
+    return <IntentionStudio />
   }
 
   // Route 3: Expert mode — original toolbar UI, but with the new theme palette

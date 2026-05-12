@@ -18,6 +18,12 @@ dependencies = [
     "striprtf>=0.0.28",
     "chardet>=5.2.0",
     "pydantic>=2.9.0",
+    # OCR for scanned PDFs and image uploads.
+    "pytesseract>=0.3.10",
+    "pillow>=10.0.0",
+    # HTTP client for the wave/intention quantum-randomness fetcher (ANU QRNG)
+    # and the optional Mistral creative layer.
+    "httpx>=0.27.0",
 ]
 
 [project.optional-dependencies]

@@ -3,12 +3,15 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
+from . import quantum
+from .calibration import CalibrationRequest, CalibrationResult, calibrate
 from .exporters import SUPPORTED_EXPORTS, get_exporter
 from .inplace import SUPPORTED_INPLACE, get_inplace_exporter
 from .models import BionicSettings, ExportRequest
@@ -133,3 +136,44 @@ async def export_inplace(
         media_type=media_type,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+# ---------------------------------------------------------------------------
+# Guided-mode v2 onboarding calibration
+# ---------------------------------------------------------------------------
+@app.post("/api/profile/calibrate", response_model=CalibrationResult)
+def profile_calibrate(req: CalibrationRequest) -> CalibrationResult:
+    """Score the guided-mode v2 wizard responses.
+
+    Combines the ASRS-v1.1 screener, the PVT vigilance task, and the
+    short reading test into a recommended `ReadingProfile` plus
+    interpretable dimensional metrics and a natural-language rationale.
+    See `app/calibration.py` for the full design + literature notes.
+    """
+    return calibrate(req)
+
+
+# ---------------------------------------------------------------------------
+# Intention Studio (wave / quantum-entropy emitter & receiver)
+# ---------------------------------------------------------------------------
+@app.post("/api/wave/emit", response_model=quantum.WaveSignal)
+async def wave_emit(req: quantum.EmitRequest) -> quantum.WaveSignal:
+    """Send an intention. Returns a quantum-entropy-derived `WaveSignal`."""
+    return await quantum.emit(req)
+
+
+@app.post("/api/wave/receive", response_model=quantum.WaveSignal)
+async def wave_receive(req: quantum.ReceiveRequest) -> quantum.WaveSignal:
+    """Pull a signal. Returns a quantum-entropy-derived `WaveSignal`."""
+    return await quantum.receive(req)
+
+
+@app.get("/api/wave/status")
+def wave_status() -> dict[str, object]:
+    """Diagnostic: which entropy / LLM sources are configured."""
+    return {
+        "qrng_endpoint": quantum.ANU_URL,
+        "llm_enabled": bool(os.environ.get("MISTRAL_API_KEY")),
+        "llm_model": quantum.MISTRAL_MODEL,
+        "archetypes": len(quantum.ARCHETYPES),
+    }

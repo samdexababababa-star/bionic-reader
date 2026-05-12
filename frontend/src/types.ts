@@ -50,11 +50,12 @@ export type ThemeChoice =
 /**
  * App mode — drives top-level navigation.
  *
- *   welcome → first-launch landing page where the user picks Guided or Expert.
- *   guided  → simplified UI with onboarding quiz + 3-button control.
- *   expert  → full toolbar (the original UI), all knobs visible.
+ *   welcome   → first-launch landing page (Guided / Expert / Intention).
+ *   guided    → onboarding v2 wizard + simplified 3-button reading shell.
+ *   expert    → full toolbar (the original UI), all knobs visible.
+ *   intention → wave / quantum-entropy "intention studio" (émetteur / récepteur).
  */
-export type AppMode = 'welcome' | 'guided' | 'expert'
+export type AppMode = 'welcome' | 'guided' | 'expert' | 'intention'
 
 /**
  * Reading profile picked by the onboarding quiz (in Guided mode).

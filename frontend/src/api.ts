@@ -101,3 +101,98 @@ async function safeDetail(res: Response): Promise<string | null> {
     return null
   }
 }
+
+// ---------------------------------------------------------------------------
+// Guided-mode v2 calibration
+// ---------------------------------------------------------------------------
+export interface ASRSResponse {
+  question_id: number
+  value: number
+}
+
+export interface PVTResult {
+  mean_rt_ms: number | null
+  median_rt_ms: number | null
+  lapses: number
+  false_starts: number
+  trials: number
+}
+
+export interface ReadingTestResult {
+  words: number
+  elapsed_ms: number
+  self_reported_difficulty: number | null
+}
+
+export interface CalibrationRequestBody {
+  asrs: ASRSResponse[]
+  pvt: PVTResult | null
+  reading: ReadingTestResult | null
+}
+
+export interface CalibrationResponse {
+  profile: 'apaise' | 'equilibre' | 'concentre' | 'sprint'
+  affinities: { apaise: number; equilibre: number; concentre: number; sprint: number }
+  dimensions: {
+    inattention: number
+    hyperactivity_impulsivity: number
+    working_memory: number
+    processing_speed: number
+    distraction_sensitivity: number
+  }
+  rationale: string
+  confidence: number
+  asrs_positive: boolean
+  reading_wpm: number | null
+}
+
+export async function calibrateProfile(body: CalibrationRequestBody): Promise<CalibrationResponse> {
+  const res = await fetch(`${API_BASE}/api/profile/calibrate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    const detail = await safeDetail(res)
+    throw new Error(detail ?? `Calibration failed (${res.status})`)
+  }
+  return (await res.json()) as CalibrationResponse
+}
+
+// ---------------------------------------------------------------------------
+// Intention Studio (quantum-entropy wave emitter / receiver)
+// ---------------------------------------------------------------------------
+export interface WaveSignal {
+  archetype: { code: string; name: string; tone: string; reflection: string }
+  message: string
+  signature: string
+  source: 'anu_qrng' | 'os_csprng'
+  used_llm: boolean
+  timestamp: number
+}
+
+export async function emitWave(intention: string): Promise<WaveSignal> {
+  const res = await fetch(`${API_BASE}/api/wave/emit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ intention }),
+  })
+  if (!res.ok) {
+    const detail = await safeDetail(res)
+    throw new Error(detail ?? `Émission échouée (${res.status})`)
+  }
+  return (await res.json()) as WaveSignal
+}
+
+export async function receiveWave(question: string): Promise<WaveSignal> {
+  const res = await fetch(`${API_BASE}/api/wave/receive`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question }),
+  })
+  if (!res.ok) {
+    const detail = await safeDetail(res)
+    throw new Error(detail ?? `Réception échouée (${res.status})`)
+  }
+  return (await res.json()) as WaveSignal
+}

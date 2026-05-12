@@ -65,7 +65,7 @@ def export_inplace(
     )
 
 
-def _process_page(page: "fitz.Page", settings: BionicSettings) -> None:
+def _process_page(page: fitz.Page, settings: BionicSettings) -> None:
     raw = page.get_text("rawdict")
     overlays: list[tuple[fitz.Rect, str, float, tuple[float, float, float], str]] = []
 

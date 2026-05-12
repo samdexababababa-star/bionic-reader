@@ -70,7 +70,7 @@ def write_docx(image_path: Path) -> None:
 
 def write_pptx(image_path: Path) -> None:
     from pptx import Presentation
-    from pptx.util import Emu, Inches
+    from pptx.util import Inches
 
     prs = Presentation()
     slide = prs.slides.add_slide(prs.slide_layouts[5])  # title-only

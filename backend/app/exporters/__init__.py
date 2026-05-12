@@ -9,7 +9,7 @@ Lazy-loaded to keep cold start light.
 from __future__ import annotations
 
 import importlib
-from typing import Callable
+from collections.abc import Callable
 
 from ..models import BionicSettings, DocumentModel
 
